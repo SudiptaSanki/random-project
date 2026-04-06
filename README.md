@@ -40,3 +40,32 @@ npx expo start --clear
 ### 📱 Running on your phone
 Simply open the **Expo Go** app on your Android or iPhone device and scan the QR Code that pops up in **Terminal 4**. 
 *(Note: Ensure your Laptop and your Phone are connected to exactly the same Wi-Fi Network so the App can successfully reach the Local Blockchain!)*
+
+---
+
+## 🌐 Web app (Firebase Hosting)
+
+A browser version of the FireCare dashboard lives in `web/` (Vite + React). It matches the mobile UI (SOS, glass cards, map link) and can call your FastAPI backend when configured.
+
+### Run locally
+```bash
+cd web
+npm install
+npm run dev
+```
+
+### Build
+```bash
+cd web
+npm run build
+```
+Output is `web/dist/`, which Firebase Hosting serves via `firebase.json` at the repo root.
+
+### Deploy to Firebase
+1. Install the [Firebase CLI](https://firebase.google.com/docs/cli) and log in: `firebase login`
+2. Create or select a project in the [Firebase console](https://console.firebase.google.com/), enable **Hosting**
+3. Set your project ID in `.firebaserc` (replace `your-firebase-project-id`) or run `firebase use --add`
+4. Optional: copy `web/.env.example` to `web/.env` and set `VITE_API_BASE_URL` to your deployed API (e.g. Cloud Run) so SOS hits `/api/emergency/trigger`
+5. From the repo root (`random-project-main/`): `firebase deploy --only hosting`
+
+Static hosting only runs the frontend. The Python API must be hosted separately (Cloud Run, Cloud Functions, etc.) and allow your Firebase domain in CORS.
