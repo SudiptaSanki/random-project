@@ -1,0 +1,90 @@
+FireCare — What Was Added (Web + Firebase)
+===========================================
+
+WHAT I DID
+----------
+1. Added a browser version of the FireCare emergency dashboard (same look and idea as the Expo mobile app: dark theme, SOS button, responder card, map link).
+
+2. Built it with Vite + React + TypeScript in a new folder called "web" so you can run it locally and build static files for hosting.
+
+3. Wired the SOS button to optionally talk to your existing Python FastAPI backend:
+   - If you set VITE_API_BASE_URL (see web/.env.example), SOS sends POST /api/emergency/trigger with user id, severity, and location.
+   - If you do not set it, the site runs in "demo mode" and shows a message (still works on Firebase without a server).
+
+4. Added optional "Connect wallet" when a browser wallet (e.g. MetaMask) is installed — uses ethers.js to connect and show a short address.
+
+5. Added Firebase Hosting configuration at the project root so "firebase deploy --only hosting" can serve the built web app from web/dist.
+
+6. Updated README.md with a "Web app (Firebase Hosting)" section: how to run, build, and deploy.
+
+7. This file (New.txt) — explains the above and what each relevant file does.
+
+
+WHAT EACH FILE / FOLDER DOES
+----------------------------
+
+WEB APP (folder: web/)
+  package.json
+    Lists npm dependencies (React, Vite, lucide-react, ethers) and scripts: "dev", "build", "preview".
+
+  vite.config.ts
+    Vite bundler settings (React plugin, dev server port).
+
+  tsconfig.json, tsconfig.node.json
+    TypeScript compiler options for the app and for Node (Vite config).
+
+  index.html
+    Single HTML shell; loads the React app and Google Fonts.
+
+  src/main.tsx
+    Entry point: mounts <App /> into the page.
+
+  src/App.tsx
+    Main UI: header (FireCare + wallet + SBT badge), status messages, SOS button with pulse, responder card, link to Google Maps (uses your location when allowed).
+
+  src/App.css
+    Styles for the web UI (gradients, glass effect, SOS button, cards, status bar).
+
+  src/index.css
+    Global reset and base body styles.
+
+  src/api.ts
+    triggerEmergency(): builds the JSON body, calls your API if VITE_API_BASE_URL is set, otherwise returns demo-mode success text.
+
+  src/wallet.ts
+    Helpers: detect injected wallet, connect with MetaMask-style API, shorten address for display.
+
+  src/vite-env.d.ts
+    TypeScript types for Vite (e.g. import.meta.env.VITE_API_BASE_URL).
+
+  web/.env.example
+    Example environment variables (copy to .env locally; VITE_* vars are baked in at build time).
+
+  web/.gitignore
+    Ignores node_modules, dist, local .env files.
+
+  web/dist/ (after npm run build)
+    Production static files — this is what Firebase Hosting uploads.
+
+
+FIREBASE (project root: random-project-main/ next to README)
+  firebase.json
+    Tells Firebase Hosting to publish the folder web/dist and send all routes to index.html (SPA).
+
+  .firebaserc
+    Maps the Firebase CLI to your project ID (you must replace "your-firebase-project-id" with your real project).
+
+
+DOCUMENTATION
+  README.md
+    Original Expo/Hardhat/backend instructions, plus the new section on running and deploying the web app.
+
+  New.txt
+    This summary file.
+
+
+NOTES
+-----
+- Firebase Hosting only serves the static frontend. Your Python API must be hosted elsewhere (e.g. Cloud Run) if you want real SOS calls from production; set VITE_API_BASE_URL before "npm run build" and fix CORS on the API for your Firebase domain.
+
+- The blockchain folder and mobile app were not removed; the web app is an additional front end, not a replacement.
